@@ -1,0 +1,28 @@
+# bash completion for sbuild (Simple Build Tool)
+# https://github.com/ktoso/sbuild-bash-completion
+#
+# sbuild site - https://github.com/harrah/xsbuild
+
+_sbuild()
+{
+    local cur prev buildfile i
+    
+    CACHE='.sbuild_completion_cache'
+
+    COMPREPLY=()
+    _get_comp_words_by_ref cur prev
+
+    if [[ "$cur" == -* ]]; then
+        COMPREPLY=( $( compgen -W '--additional-buildfile --buildfile --check --check-recursive --clean --create-stub --define --dependency-tree --execution-plan --fsc --help --just-clean --just-clean-recursive --list-modules --list-targets --list-targets-recursive --no-color --no-fsc --quiet --verbose --version -D -F -f -h -l -L -q -v' -- "$cur" ) )
+        return 0
+    else
+        if [ -e '.sbuild_completion_cache' ]; then
+            COMPREPLY=( $( compgen -W "`cat $CACHE`" -- "$cur" ) )
+        else
+
+            COMPREPLY=( $( compgen -W "`sbuild -l | grep '.*' | awk '{ print $1 }' | tee $CACHE `" -- "$cur" ) )
+        fi
+        return 0
+    fi
+}
+complete -F _sbuild sbuild
